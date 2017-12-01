@@ -1,5 +1,5 @@
 CC = gcc
-CFLAG = 
+CFLAG = -std=c99
 
 test: route.c
 	$(CC) $(CFLAG) route.c -o route
