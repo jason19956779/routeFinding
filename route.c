@@ -7,7 +7,7 @@
 /* Node that has reached flag in markTable */
 #define CHECKED 1
 
-/* Route type define */
+/* Define route type */
 #define UNREACHABLE 0
 #define UNKNOWN -1
 
@@ -66,6 +66,10 @@ int32_t getMarkedDistance(node_t node, uint32_t counter) {
     return markTable[node][counter*2];
 }
 
+int32_t getCheckedNode(node_t node, uint32_t counter) {
+    return markTable[node][counter*2+1];
+}
+
 int32_t min(int32_t a, int32_t b) {
     return (a == UNKNOWN || a > b)? b : a;
 }
@@ -83,7 +87,7 @@ node_t nearestNode(node_t current) {
         else {
             setMarkedDistance(i, 0);
         }
-        printf("loop %d min %d\n", i, minDis);
+        printf("counter %d loop %d min %d\n", counter, i, minDis);
         printMarkTable();
     }
 
@@ -97,11 +101,12 @@ int main() {
 
     initMarkTable();
     setStartingPoint();
-    printMarkTable();
     
-    next = nearestNode(current);
-    
-    printf("Next: %d\n", next);
+    while(counter < (uint32_t)(NODENUM)) {
+        next = nearestNode(current);
+        printf("Next: %d\n\n", next);
+        current = next;
+    }
     
     return 0;
 }

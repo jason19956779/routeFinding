@@ -1,7 +1,15 @@
-CC = gcc
-CFLAG = -std=c99
+CC := gcc
+DBGR := gdb
+CFLAG := -std=c99 -g
+BUILDDIR := ./
+SOURCE := route.c
+BIN := route
 
-test: route.c
-	$(CC) $(CFLAG) route.c -o route
+default: $(SOURCE)
+	$(CC) $(CFLAG) $(SOURCE) -o $(BIN)
+test: $(BIN)
+	$(BUILDDIR)$(BIN)
+debug: $(BIN)
+	$(DBGR) $(BIN)
 clean:
-	@rm -rf route
+	@rm -rf $(BIN)
