@@ -32,6 +32,7 @@ void initMarkTable() {
 
 /* Test function Section */
 void printMarkTable() {
+    printf("*");
     for(int i=0; i<NODENUM; i+=1) {
         for(int j=0; j<NODENUM*2; j+=1) {
             printf("%d ", markTable[i][j]);
@@ -43,18 +44,20 @@ void printMarkTable() {
 uint32_t counter = 0; /* Find path counter */
 
 void setMarkedDistance(node_t node, int32_t distance) {
-    markTable[node][counter*2] = distance;
+    for(int i=counter; i<NODENUM; i+=1)
+        markTable[node][i*2] = distance;
 }
 
 /* Mark this node as checked node */
-void nodeChecked(node_t node, uint32_t counter) {
-    markTable[node][counter*2+1] = CHECKED;
+void setNodeChecked(node_t node) {
+    for(int i=counter; i<NODENUM; i+=1)
+        markTable[node][i*2+1] = CHECKED;
 }
 
 void setStartingPoint() {
     counter = 0;
     setMarkedDistance(0, 0);
-    nodeChecked(0, (uint32_t)counter);
+    setNodeChecked(0);
     counter += 1;
 }
 
@@ -77,21 +80,31 @@ int32_t min(int32_t a, int32_t b) {
 node_t nearestNode(node_t current) {
     node_t nearest = current;
     int32_t minDis = UNKNOWN;
+
     for(int i=0; i<NODENUM; i+=1) {
         int32_t dis = getDistance(current, i);
+
         if(dis > 0) {
             setMarkedDistance(i, min(getMarkedDistance(i, counter), getMarkedDistance(current, counter-1) + dis));
-            if(getMarkedDistance(i, counter) < minDis) nearest = i;
-            minDis = getMarkedDistance(i, counter);
+            if(getMarkedDistance(i, counter)>0 && getMarkedDistance(i, counter) == min(minDis, getMarkedDistance(i, counter)) && getCheckedNode(i, counter) == 0)
+                minDis = getMarkedDistance(i, counter);
         }
-        else {
-            setMarkedDistance(i, 0);
+        if(dis == 0) {
+            if(getMarkedDistance(i, counter) == UNKNOWN)
+                markTable[i][counter*2] = 0;
+            if(getMarkedDistance(i, counter)>0 && getMarkedDistance(i, counter) == min(minDis, getMarkedDistance(i, counter)) && getCheckedNode(i, counter) == 0)
+                minDis = getMarkedDistance(i, counter);
         }
-        printf("counter %d loop %d min %d\n", counter, i, minDis);
+        printf("counter %d i %d minDis %d dis %d\n", counter, i, minDis, dis);
         printMarkTable();
     }
-
+    for(int i=0; i<NODENUM; i+=1) {
+        if(getMarkedDistance(i, counter)>0 && getMarkedDistance(i, counter) == min(minDis, getMarkedDistance(i, counter)) && getCheckedNode(i, counter) == 0) 
+            nearest = i;
+    }
+    setNodeChecked(nearest);
     counter += 1;
+    printMarkTable();
     return nearest;
 }
 
@@ -102,7 +115,7 @@ int main() {
     initMarkTable();
     setStartingPoint();
     
-    while(counter < (uint32_t)(NODENUM)) {
+    while(counter < (uint32_t)NODENUM) {
         next = nearestNode(current);
         printf("Next: %d\n\n", next);
         current = next;
