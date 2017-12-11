@@ -2,7 +2,7 @@
 #include <stdint.h>
 
 /* Total node number in route map */
-#define NODENUM 7
+#define NODENUM 6
 
 /* Node that has reached flag in markTable */
 #define CHECKED 1
@@ -15,13 +15,12 @@ typedef uint32_t node_t;
 
 node_t node = 0;
 const int32_t route[NODENUM][NODENUM] = {
-    {0, 3, 2, 0, 0, 0, 0},
-    {0, 0 ,0, 2, 0, 0, 0},
-    {0, 0, 0, 3, 0, 0, 0},
-    {0, 0, 0, 0, 3, 2, 0},
-    {0, 0, 0, 0, 0, 0, 3},
-    {0, 0, 0, 0, 0, 0, 6},
-    {0, 0, 0, 0, 0, 0, 0}
+    {0, 4, 7, 3, 0, 0},
+    {0, 0, 3, 0, 6, 0},
+    {0, 0, 0, 0, 0, 4},
+    {0, 0, 0, 0, 3, 0},
+    {0, 0, 0, 0, 0, 2},
+    {0, 0, 0, 0, 0, 0}
 };
 
 int32_t markTable[NODENUM][NODENUM*2] = {};
@@ -82,6 +81,12 @@ int32_t min(int32_t a, int32_t b) {
     return (a == UNKNOWN || a > b)? b : a;
 }
 
+void testPrintRoute() {
+    for(int i=0; i<NODENUM; i+=1) {
+        printf("pred[%d] = %d\n", i, pred[i]);
+    }
+}
+
 node_t nextNode(node_t current) {
     node_t next = current;
     int32_t minDis = UNKNOWN;
@@ -90,11 +95,17 @@ node_t nextNode(node_t current) {
         int32_t dis = getDistance(current, i);
 
         if(dis > 0) {
-            setMarkedDistance(i, min(getMarkedDistance(i, counter), getMarkedDistance(current, counter-1) + dis));
+            if(getMarkedDistance(current, counter-1) + dis == min(getMarkedDistance(i, counter), getMarkedDistance(current, counter-1) + dis)) {
+                setMarkedDistance(i, getMarkedDistance(current, counter-1) + dis);
+                printf("current: %d\n", current);
+                pred[i] = current;
+            }
+            //setMarkedDistance(i, min(getMarkedDistance(i, counter), getMarkedDistance(current, counter-1) + dis));
             if(getMarkedDistance(i, counter)>0 && getMarkedDistance(i, counter) == min(minDis, getMarkedDistance(i, counter)) && getCheckedNode(i, counter) == 0) {
                 minDis = getMarkedDistance(i, counter);
+                
             }
-            pred[i] = current;
+            
         }
         if(dis == 0) {
             if(getMarkedDistance(i, counter) == UNKNOWN)
@@ -103,6 +114,7 @@ node_t nextNode(node_t current) {
                 minDis = getMarkedDistance(i, counter);
         }
         printf("counter %d i %d minDis %d dis %d\n", counter, i, minDis, dis);
+        testPrintRoute();
         printMarkTable();
     }
     for(int i=0; i<NODENUM; i+=1) {
