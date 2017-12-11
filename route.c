@@ -82,11 +82,9 @@ node_t nextNode(node_t current) {
                 setMarkedDistance(i, getMarkedDistance(current, counter-1) + dis);
                 pred[i] = current;
             }
-            //setMarkedDistance(i, min(getMarkedDistance(i, counter), getMarkedDistance(current, counter-1) + dis));
             if(getMarkedDistance(i, counter)>0 && getMarkedDistance(i, counter) == min(minDis, getMarkedDistance(i, counter)) && getCheckedNode(i, counter) == 0) {
                 minDis = getMarkedDistance(i, counter);
             }
-            
         }
         if(dis == 0) {
             if(getMarkedDistance(i, counter) == UNKNOWN)
@@ -105,11 +103,34 @@ node_t nextNode(node_t current) {
     return next;
 }
 
-int32_t getMinDistance() {
-    return markTable[NODENUM-1][(NODENUM-1)*2];
+void printRouteMatrix() {
+    int i=0, j=0;
+    printf("Adjacency Matrix:\n");
+    printf("  S ");
+    for(i=1; i<NODENUM; i+=1) {
+        if(i<NODENUM-1)
+            printf("%d ", i);
+        else
+            printf("T");
+    }
+    printf("\n");
+
+    for(i=0; i<NODENUM; i+=1) {
+        if(i == 0)
+            printf("S ");
+        else if(i == NODENUM-1)
+            printf("T ");
+        else
+            printf("%d ", i);
+        for(j=0; j<NODENUM; j+=1) {
+            printf("%d ", route[i][j]);
+        }
+        printf("\n");
+    }
+    printf("\n");
 }
 
-void printRoute() {
+void printPath() {
     int i = NODENUM-1;
     printf("End <- ");
     while(pred[i]!=0) {
@@ -119,9 +140,15 @@ void printRoute() {
     printf("Start\n");
 }
 
+int32_t getMinDistance() {
+    return markTable[NODENUM-1][(NODENUM-1)*2];
+}
+
 int main() {
     node_t current = 0;
     node_t next = 0;
+
+    printRouteMatrix();
 
     initMarkTable();
     setStartingPoint();
@@ -132,7 +159,7 @@ int main() {
     }
 
     printf("The shortest Path is: ");
-    printRoute();
+    printPath();
     printf("It's distance is: %d\n", getMinDistance());
     
     return 0;
