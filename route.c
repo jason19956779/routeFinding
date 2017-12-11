@@ -134,12 +134,12 @@ int32_t getMinDistance() {
 
 void printRoute() {
     int i = NODENUM-1;
-    printf("%d<-", (uint32_t)NODENUM);
+    printf("End <- ");
     while(pred[i]!=0) {
-        printf("%d<-", pred[i]);
+        printf("%d <- ", pred[i]);
         i = pred[i];
     }
-    printf("0\n");
+    printf("Start\n");
 }
 
 int main() {
